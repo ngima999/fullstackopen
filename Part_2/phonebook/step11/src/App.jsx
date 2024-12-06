@@ -37,7 +37,7 @@ const App = () => {
           setPersons(persons.map(p => (p.id !== existingPerson.id ? p : returnedPerson)));
           handleNotification(`Updated ${newName}'s number`, 'success');
         })
-        .catch(error => {
+        .catch((error) => {
           handleNotification(`Error: ${newName} was already removed from the server.`, 'error');
           setPersons(persons.filter(p => p.id !== existingPerson.id));
         });
@@ -48,8 +48,11 @@ const App = () => {
           setPersons(persons.concat(returnedPerson));
           handleNotification(`Added ${newName}`, 'success');
         })
-        .catch(error => {
-          handleNotification('Error: Unable to add person. Please try again.', 'error');
+        .catch((error) => {
+          handleNotification(error.response.data.error);
+          setTimeout(() => {
+            handleNotification("");
+          }, 8000);
         });
     }
     setNewName('');
@@ -66,7 +69,7 @@ const App = () => {
           setPersons(persons.filter(p => p.id !== id));
           handleNotification(`Deleted ${person.name}`, 'success');
         })
-        .catch(error => {
+        .catch((error) => {
           handleNotification(`Error: ${person.name} was already removed from the server.`, 'error');
           setPersons(persons.filter(p => p.id !== id));
         });
