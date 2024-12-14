@@ -1,6 +1,6 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const { dummy, totalLikes, favoriteBlog, mostBlogs } = require('../utils/list_helper')
+const { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes } = require('../utils/list_helper')
 
 const blogs = [
   { title: 'Blog 1', author: 'Author 1', likes: 5 },
@@ -69,5 +69,18 @@ describe('mostBlogs', () => {
     });
   });
   
+
+  describe('mostLikes', () => {
+    const blogs = [
+      { title: 'Blog 1', author: 'Author 1', likes: 5 },
+      { title: 'Blog 2', author: 'Author 2', likes: 10 },
+      { title: 'Blog 3', author: 'Author 1', likes: 7 },
+      { title: 'Blog 4', author: 'Author 3', likes: 3 }
+    ];
+  
+    test('returns the author with the most likes', () => {
+      assert.deepStrictEqual(mostLikes(blogs), { author: 'Author 1', likes: 12 });
+    });
+  });
 
 

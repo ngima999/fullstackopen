@@ -27,6 +27,22 @@ const mostBlogs = (blogs) => {
   
     return topAuthor;
   };
+
+  const mostLikes = (blogs) => {
+    const authorLikes = blogs.reduce((authorMap, blog) => {
+      authorMap[blog.author] = (authorMap[blog.author] || 0) + blog.likes;
+      return authorMap;
+    }, {});
+    
+    const topAuthor = Object.entries(authorLikes).reduce((top, [author, likes]) => {
+      if (likes > top.likes) {
+        return { author, likes };
+      }
+      return top;
+    }, { author: '', likes: 0 });
+  
+    return topAuthor;
+  };
   
  
   
@@ -36,6 +52,7 @@ const mostBlogs = (blogs) => {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
   }
   
