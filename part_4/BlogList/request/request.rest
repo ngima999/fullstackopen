@@ -10,10 +10,10 @@ POST http://localhost:3003/api/blogs
 content-type: application/json
 
 {
-  "title": "V8 Engine",
-  "author": "Sita Hamal",
-  "url": "https://v8.com",
-  "likes": 12
+  "title": "Understanding Node.js",
+  "author": "Ravi Kumar",
+  "url": "https://nodejs.org",
+  "likes": 25
 }
 
 
