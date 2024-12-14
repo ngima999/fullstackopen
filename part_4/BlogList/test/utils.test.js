@@ -25,3 +25,13 @@ describe('totalLikes', () => {
 })
 
 
+describe('favoriteBlog', () => {
+  test('of a list with blogs is the one with the most likes', () => {
+    const mostLikedBlog = favoriteBlog(blogs)
+    console.log('Most liked blog:', mostLikedBlog)
+    
+    assert.deepStrictEqual(favoriteBlog(blogs), { title: 'Blog 2', author: 'Author 2', likes: 10 })
+  })
+})
+
+
