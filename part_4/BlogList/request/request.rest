@@ -1,0 +1,29 @@
+DELETE http://localhost:3001/api/persons/674db7c07636eb07defd5683
+
+###
+
+GET http://localhost:3003/api/blogs
+
+####
+
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+  "title": "V8 Engine",
+  "author": "Sita Hamal",
+  "url": "https://v8.com",
+  "likes": 12
+}
+
+
+####
+
+PUT http://localhost:3001/api/persons/674dda8d887c653059821956
+Content-Type: application/json
+
+{
+    "name": "Kir",
+    "number": "88888888"
+}
+
