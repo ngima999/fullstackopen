@@ -1,12 +1,12 @@
-DELETE http://localhost:3001/api/persons/674db7c07636eb07defd5683
+DELETE http://localhost:3001/api/blogs/675dbb1b2f5931166c598019
 
 ###
 
-GET http://localhost:3003/api/blogs
+GET http://localhost:3001/api/blogs/675dbb1b2f5931166c598019
 
 ####
 
-POST http://localhost:3003/api/blogs
+POST http://localhost:3001/api/blogs
 content-type: application/json
 
 {

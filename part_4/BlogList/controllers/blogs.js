@@ -2,14 +2,35 @@ const express = require('express');
 const Blog = require('../models/mongo');
 const blogsRouter = express.Router();
 
-blogsRouter.get('/', async (request, response) => {
+
+blogsRouter.get('/', async (request, response, next) => {
   try {
     const blogs = await Blog.find({});
     response.json(blogs);
   } catch (error) {
-    response.status(500).json({ error: 'Failed to fetch blogs' });
+    // response.status(500).json({ error: 'Failed to fetch blogs' });
+    next(error);
   }
 });
+
+
+
+// Get individual blog by id
+blogsRouter.get('/:id', async (request, response, next) => {
+  try {
+    const blog = await Blog.findById(request.params.id);
+
+    if (blog) {
+      response.json(blog);
+    } else {
+      response.status(404).json({ error: 'Blog not found' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body;
@@ -25,8 +46,10 @@ blogsRouter.post('/', async (request, response) => {
     const savedBlog = await blog.save();
     response.status(201).json(savedBlog);
   } catch (error) {
-    response.status(400).json({ error: 'Failed to save blog' });
+    // response.status(400).json({ error: 'Failed to save blog' });
+    next(error);
   }
 });
+
 
 module.exports = blogsRouter;

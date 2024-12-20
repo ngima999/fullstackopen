@@ -31,6 +31,21 @@ test('the correct number of blog posts are returned', async () => {
     // Assert that the title of the first blog is "Learn JavaScript"
     assert.strictEqual(firstBlog.title, 'Blog 1');
   });
+
+
+
+  test('the blogs have an id property instead of _id', async () => {
+    const response = await api.get('/api/blogs')
+  
+    // Get the first blog from the response
+    const firstBlog = response.body[0]
+  
+    // Assert that the blog has the 'id' property
+    assert.strictEqual(firstBlog.hasOwnProperty('id'), true)
+    // Assert that the '_id' property does not exist
+    assert.strictEqual(firstBlog.hasOwnProperty('_id'), false)
+  })
+  
   
  
 
