@@ -46,7 +46,46 @@ test('the correct number of blog posts are returned', async () => {
     assert.strictEqual(firstBlog.hasOwnProperty('_id'), false)
   })
   
-  
+
+
+// New Test: Verify POST request creates a new blog
+test('making an HTTP POST request successfully creates a new blog post', async () => {
+  // Fetch the initial number of blogs
+  const initialResponse = await api.get('/api/blogs');
+  const initialBlogsCount = initialResponse.body.length;
+
+  // Data for the new blog post
+  const newBlog = {
+    title: 'New Blog Title',
+    author: 'John Doe',
+    url: 'http://example.com/new-blog',
+    likes: 5,
+  };
+
+  // Make the POST request
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  // Assert that the response contains the new blog's title
+  assert.strictEqual(postResponse.body.title, newBlog.title);
+
+  // Fetch the blogs after the POST request
+  const finalResponse = await api.get('/api/blogs');
+  const finalBlogsCount = finalResponse.body.length;
+
+  // Assert that the number of blogs increased by one
+  assert.strictEqual(finalBlogsCount, initialBlogsCount + 1);
+
+  // Verify that the content is saved correctly
+  const savedBlog = finalResponse.body.find(blog => blog.title === newBlog.title);
+  assert(savedBlog);
+  assert.strictEqual(savedBlog.author, newBlog.author);
+  assert.strictEqual(savedBlog.url, newBlog.url);
+  assert.strictEqual(savedBlog.likes, newBlog.likes);
+});
  
 
 
