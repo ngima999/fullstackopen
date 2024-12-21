@@ -109,6 +109,42 @@ test('if likes property is missing, it defaults to 0', async () => {
 
 
 
+test('should return 400 if title is missing', async () => {
+  const newBlog = {
+    author: 'John Doe',
+    url: 'http://example.com/no-title',
+    likes: 5,
+  };
+
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)  // Expect 400 Bad Request
+    .expect('Content-Type', /application\/json/);
+
+  assert.strictEqual(postResponse.body.error, 'Title is required');
+});
+
+
+
+test('should return 400 if url is missing', async () => {
+  const newBlog = {
+    title: 'Blog without URL',
+    author: 'John Doe',
+    likes: 5,
+  };
+
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)  // Expect 400 Bad Request
+    .expect('Content-Type', /application\/json/);
+
+  assert.strictEqual(postResponse.body.error, 'URL is required');
+});
+
+
+
 
 after(async () => {
   await mongoose.connection.close()

@@ -32,8 +32,16 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', async (request, response, next) => {
   const { title, author, url, likes } = request.body;
+  
+  // Check if title or url is missing and return 400 if true
+  if (!title) {
+    return response.status(400).json({ error: 'Title is required' });
+  }
+  if (!url) {
+    return response.status(400).json({ error: 'URL is required' });
+  }
 
   const blog = new Blog({
     title,
