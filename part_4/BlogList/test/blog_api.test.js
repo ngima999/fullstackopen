@@ -88,6 +88,27 @@ test('making an HTTP POST request successfully creates a new blog post', async (
 });
  
 
+test('if likes property is missing, it defaults to 0', async () => {
+  // Data for the new blog post without likes
+  const newBlog = {
+    title: 'Blog with no likes',
+    author: 'John Doe',
+    url: 'http://example.com/no-likes',
+  };
+
+  // Make the POST request
+  const postResponse = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  // Assert that the likes property is 0
+  assert.strictEqual(postResponse.body.likes, 0);
+});
+
+
+
 
 after(async () => {
   await mongoose.connection.close()
