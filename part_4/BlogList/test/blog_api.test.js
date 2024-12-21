@@ -146,6 +146,39 @@ test('should return 400 if url is missing', async () => {
 
 
 
+test('should delete a blog post by id', async () => {
+  const newBlog = {
+    title: 'Test Blog',
+    author: 'Test Author',
+    url: 'http://example.com',
+    likes: 0,
+  };
+
+  const createdBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  await api
+    .delete(`/api/blogs/${createdBlog.body.id}`)
+    .expect(204);
+
+  const response = await api
+    .get(`/api/blogs/${createdBlog.body.id}`)
+    .expect(404)
+    .expect('Content-Type', /application\/json/);
+
+  assert.strictEqual(response.body.error, 'Blog not found');
+});
+
+
+
+
+
+
+
+
 after(async () => {
   await mongoose.connection.close()
 })
