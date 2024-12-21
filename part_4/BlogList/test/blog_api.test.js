@@ -174,6 +174,45 @@ test('should delete a blog post by id', async () => {
 
 
 
+test('should update the number of likes for a blog post', async () => {
+  // Create a new blog post
+  const newBlog = {
+    title: 'Update Blog',
+    author: 'Update Author',
+    url: 'http://example-update.com',
+    likes: 5,
+  };
+
+  const createdBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  // Update the likes field
+  const updatedLikes = { likes: 10 };
+
+  const updatedBlog = await api
+    .put(`/api/blogs/${createdBlog.body.id}`)
+    .send(updatedLikes)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  // Validate the updated likes
+  assert.strictEqual(updatedBlog.body.likes, 10, 'Likes should be updated to 10');
+
+  // Fetch the blog and confirm the update
+  const response = await api
+    .get(`/api/blogs/${createdBlog.body.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  assert.strictEqual(response.body.likes, 10, 'Fetched blog should have updated likes as 10');
+});
+
+
+
+
 
 
 
