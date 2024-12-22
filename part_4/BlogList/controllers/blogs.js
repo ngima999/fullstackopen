@@ -54,6 +54,7 @@ blogsRouter.post('/', async (request, response, next) => {
   try {
     const savedBlog = await blog.save();
     response.status(201).json(savedBlog);
+    
   } catch (error) {
     // response.status(400).json({ error: 'Failed to save blog' });
     next(error); // Forward error to the error handler

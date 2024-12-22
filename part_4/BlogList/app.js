@@ -1,12 +1,11 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const blogsRouter = require('./controllers/blogs');
-const { MONGODB_URI } = require('./utils/config');
 const cors = require('cors');
+const { MONGODB_URI } = require('./utils/config');
 const { errorHandler } = require('./utils/middleware')
 const usersRouter = require('./controllers/users')
-
+const blogsRouter = require('./controllers/blogs');
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
