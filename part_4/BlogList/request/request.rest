@@ -1,11 +1,14 @@
+
+
+/* Blogs */
+
+####
 DELETE http://localhost:3001/api/blogs/675dbb1b2f5931166c598019
 
-###
-
+####
 GET http://localhost:3001/api/blogs/675dbb1b2f5931166c598019
 
 ####
-
 POST http://localhost:3001/api/blogs
 content-type: application/json
 
@@ -18,12 +21,26 @@ content-type: application/json
 
 
 ####
-
 PUT http://localhost:3001/api/persons/674dda8d887c653059821956
 Content-Type: application/json
 
 {
     "name": "Kir",
     "number": "88888888"
+}
+
+
+
+
+/* Users */
+
+####
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "username": "mluukkai",
+    "name": "Matti Luukkai",
+    "password": "qazwsx@"
 }
 

@@ -1,6 +1,7 @@
 const express = require('express');
-const Blog = require('../models/mongo');
+const Blog = require('../models/blog');
 const blogsRouter = express.Router();
+
 
 
 blogsRouter.get('/', async (request, response, next) => {
