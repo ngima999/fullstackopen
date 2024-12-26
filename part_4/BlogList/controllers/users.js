@@ -9,8 +9,13 @@ const User = require('../models/user');
 
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
-  response.json(users)
+  try {
+    // Populate the blogs field with title and url
+    const users = await User.find({}).populate('blogs', {  url: 1, title: 1, author: 1 });
+    response.json(users);
+  } catch (error) {
+    next(error);
+  }
 })
 
 

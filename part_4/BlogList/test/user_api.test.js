@@ -40,6 +40,8 @@ describe('when there is initially one user in db', () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length);
   });
 
+
+  // Test case: creation should succeed with a fresh (unique) username
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb();
 
@@ -63,6 +65,8 @@ describe('when there is initially one user in db', () => {
     assert(usernames.includes(newUser.username));
   });
 
+
+  // Test case: creation should fail if the username or password is less than 3 characters
   test('creation fails if username or password is less than 3 characters', async () => {
     const usersAtStart = await helper.usersInDb();
 

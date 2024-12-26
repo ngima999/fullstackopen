@@ -1,12 +1,13 @@
 const express = require('express');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const blogsRouter = express.Router();
 
 
 
 blogsRouter.get('/', async (request, response, next) => {
   try {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1});
     response.json(blogs);
   } catch (error) {
     // response.status(500).json({ error: 'Failed to fetch blogs' });
@@ -44,15 +45,28 @@ blogsRouter.post('/', async (request, response, next) => {
     return response.status(400).json({ error: 'URL is required' });
   }
 
-  const blog = new Blog({
-    title,
-    author,
-    url,
-    likes: likes || 0,
-  });
-
+ 
   try {
+    // Find the first user from the database
+    const user = await User.findOne();
+
+    if (!user) {
+      return response.status(400).json({ error: 'No users found. Add a user first.' });
+    }
+
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes: likes || 0,
+      user: user._id,  //Assign user as a creator
+    });
+
+    
     const savedBlog = await blog.save();
+    // Update the user's blogs array
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
     response.status(201).json(savedBlog);
     
   } catch (error) {
