@@ -4,27 +4,19 @@ const User = require('../models/user');
 
 
 const userExtractor = async (request, response, next) => {
-  try {
-    const token = request.token; // Token should already be extracted by tokenExtractor middleware
-    if (!token) {
-      return response.status(401).json({ error: 'Token missing' });
+  const authorization = request.get('Authorization');
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    const token = authorization.substring(7);
+    try {
+      const decodedToken = jwt.verify(token, process.env.SECRET);
+      request.user = await User.findById(decodedToken.id);
+    } catch (error) {
+      return response.status(401).json({ error: 'token missing or invalid' });
     }
-
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'Token invalid' });
-    }
-
-    const user = await User.findById(decodedToken.id);
-    if (!user) {
-      return response.status(404).json({ error: 'User not found' });
-    }
-
-    request.user = user;
-    next();
-  } catch (error) {
-    next(error);
+  } else {
+    return response.status(401).json({ error: 'token missing or invalid' });
   }
+  next();
 };
 
 

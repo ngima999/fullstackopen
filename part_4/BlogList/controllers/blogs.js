@@ -36,9 +36,14 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 // Create a new blog
 blogsRouter.post('/', async (request, response, next) => {
+  const user = request.user;
+  if (!user) {
+    return response.status(401).json({ error: 'token missing or invalid' });
+  }
+
   try {
     const { title, author, url, likes } = request.body;
-    const user = request.user;
+    
 
     const blog = new Blog({
       title,

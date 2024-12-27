@@ -23,10 +23,10 @@ app.use(cors());
 app.use(express.json());
 // Token extractor middleware
 app.use(tokenExtractor);
-app.use(middleware.userExtractor)
+app.use(userExtractor)
 
 // Routes
-app.use('/api/blogs', middleware.tokenExtractor, middleware.userExtractor, blogsRouter)
+app.use('/api/blogs', tokenExtractor, userExtractor, blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 

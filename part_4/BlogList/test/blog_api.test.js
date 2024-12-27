@@ -1,10 +1,14 @@
-// const { test, after } = require('node:test')
-// const mongoose = require('mongoose')
-// const supertest = require('supertest')
-// const app = require('../app')
-// const assert = require('assert');
+const { test, after } = require('node:test')
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const app = require('../app')
+const assert = require('assert');
+const Blog = require('../models/blog');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const { initialBlogs, nonExistingId, usersInDb } = require('./test_helper'); // assuming you have a helper to fetch initial data
+const api = supertest(app)
 
-// const api = supertest(app)
 
 // test('blogs are returned as json', async () => {
 //   await api
@@ -212,13 +216,31 @@
 
 
 
+test('should return 401 Unauthorized if no token is provided for creating a blog', async () => {
+    const newBlog = {
+      title: 'Blog Without Token',
+      author: 'Author',
+      url: 'http://example.com/no-token',
+      likes: 0,
+    };
+  
+    // Make the POST request without the token
+    const postResponse = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)  // Expect 401 Unauthorized
+      .expect('Content-Type', /application\/json/);
+  
+    // Assert that the response contains the correct error message
+    assert.strictEqual(postResponse.body.error, 'token missing or invalid');
+  });
+  
 
 
 
 
 
-
-// after(async () => {
-//   await mongoose.connection.close()
-// })
+after(async () => {
+  await mongoose.connection.close()
+})
 
