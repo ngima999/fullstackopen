@@ -2,7 +2,7 @@ const express = require('express');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 const blogsRouter = express.Router();
-
+const jwt = require('jsonwebtoken');
 
 
 blogsRouter.get('/', async (request, response, next) => {
@@ -34,24 +34,41 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 
 
+// Helper function to extract token
+const getTokenFrom = (request) => {
+  const authorization = request.get('authorization');
+  return authorization && authorization.startsWith('Bearer ')
+    ? authorization.replace('Bearer ', '')
+    : null;
+};
+
+
+
+
+
 blogsRouter.post('/', async (request, response, next) => {
   const { title, author, url, likes } = request.body;
-  
-  // Check if title or url is missing and return 400 if true
-  if (!title) {
-    return response.status(400).json({ error: 'Title is required' });
-  }
-  if (!url) {
-    return response.status(400).json({ error: 'URL is required' });
+
+  if (!title || !url) {
+    return response.status(400).json({ error: 'Title and URL are required' });
   }
 
- 
   try {
-    // Find the first user from the database
-    const user = await User.findOne();
+    const token = getTokenFrom(request);
+    if (!token) {
+      return response.status(401).json({ error: 'Token missing' });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'Token invalid' });
+    }
+
+    const user = await User.findById(decodedToken.id);
 
     if (!user) {
-      return response.status(400).json({ error: 'No users found. Add a user first.' });
+      return response.status(401).json({ error: 'User not found' });
     }
 
     const blog = new Blog({
@@ -59,19 +76,16 @@ blogsRouter.post('/', async (request, response, next) => {
       author,
       url,
       likes: likes || 0,
-      user: user._id,  //Assign user as a creator
+      user: user._id,
     });
 
-    
     const savedBlog = await blog.save();
-    // Update the user's blogs array
     user.blogs = user.blogs.concat(savedBlog._id);
     await user.save();
+
     response.status(201).json(savedBlog);
-    
   } catch (error) {
-    // response.status(400).json({ error: 'Failed to save blog' });
-    next(error); // Forward error to the error handler
+    next(error);
   }
 });
 

@@ -8,16 +8,29 @@ DELETE http://localhost:3001/api/blogs
 ####
 GET http://localhost:3001/api/blogs
 
-####
+#### Example of Valid 
 POST http://localhost:3001/api/blogs 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkhhcmkgTGFsIiwiaWQiOiI2NzZlMmQ2Y2M4YTg2NDBmOWYyMmI1ZGMiLCJpYXQiOjE3MzUyNzM4ODh9.5WQenVoUK8Nk29T7zX4wpySSrYuda8c0rbuaitqiyko
 Content-Type: application/json
 
 {
-  "title": "Web Browser",
-  "author": "Lalu Prasad",
-  "url": "https://example.com/node-architecture",
-  "likes": 10,
-  "userId": "676c3430734a264aaae53e3f"
+  "title": "SEO",
+  "author": "Kali Prasad",
+  "url": "https://example.com/SEO",
+  "likes": 0
+}
+
+
+#### Example of invalid Token
+POST http://localhost:3001/api/blogs 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkhhcmkgTGFsIiwiaWQiOiI2NzZlMmQ2Y2M4YTg2NDBmOWYyMmI1ZGMiLCJpYXQiOjE3MzUyNzM4ODh9.5WQenVoUK8Nk29T7zX4wpySSrYuda8caaaaaaaa
+Content-Type: application/json
+
+{
+  "title": "SEO",
+  "author": "Kali Prasad",
+  "url": "https://example.com/SEO",
+  "likes": 0
 }
 
 
@@ -41,9 +54,9 @@ POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-    "username": "mluukkai",
-    "name": "Matti Luukkai",
-    "password": "qazwsx@"
+    "username": "Hari Lal",
+    "name": "Hari Lal",
+    "password": "ASDfg@"
 }
 
 
@@ -60,8 +73,8 @@ POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-    "username": "mluukkai",
-    "password": "qazwsx@"
+     "username": "Hari Lal",
+    "password": "ASDfg@"
 }
 
 
