@@ -34,18 +34,6 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 
 
-// Helper function to extract token
-const getTokenFrom = (request) => {
-  const authorization = request.get('authorization');
-  return authorization && authorization.startsWith('Bearer ')
-    ? authorization.replace('Bearer ', '')
-    : null;
-};
-
-
-
-
-
 blogsRouter.post('/', async (request, response, next) => {
   const { title, author, url, likes } = request.body;
 
@@ -54,19 +42,13 @@ blogsRouter.post('/', async (request, response, next) => {
   }
 
   try {
-    const token = getTokenFrom(request);
-    if (!token) {
-      return response.status(401).json({ error: 'Token missing' });
-    }
 
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'Token invalid' });
     }
 
     const user = await User.findById(decodedToken.id);
-
     if (!user) {
       return response.status(401).json({ error: 'User not found' });
     }
@@ -94,17 +76,28 @@ blogsRouter.post('/', async (request, response, next) => {
 // Delete a blog by id
 blogsRouter.delete('/:id', async (request, response, next) => {
   try {
-    const deletedBlog = await Blog.findByIdAndDelete(request.params.id);
-
-    if (deletedBlog) {
-      response.status(204).end();  // No content, successful deletion
-    } else {
-      response.status(404).json({ error: 'Blog not found' });
+    
+    const decodedToken = jwt.verify(request.token, process.env.SECRET);
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'Token invalid' });
     }
+
+    const blog = await Blog.findById(request.params.id);
+    if (!blog) {
+      return response.status(404).json({ error: 'Blog not found' });
+    }
+
+    if (blog.user.toString() !== decodedToken.id) {
+      return response.status(403).json({ error: 'Not authorized to delete this blog' });
+    }
+
+    await blog.remove();
+    response.status(204).end();
   } catch (error) {
     next(error);
   }
 });
+
 
 
 
