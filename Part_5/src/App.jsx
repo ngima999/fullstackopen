@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const App = () => {
@@ -7,11 +7,31 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+
+
+  useEffect(() => {
+    // Check localStorage for saved user data
+    const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      // Fetch blogs with the saved token
+      axios
+        .get('/api/blogs', { headers: { Authorization: `Bearer ${user.token}` } })
+        .then((response) => setBlogs(response.data))
+    }
+  }, [])
+
+
+
+
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const response = await axios.post('/api/login', { username, password })
-      setUser(response.data) // Save the user to state
+      const user = response.data
+      localStorage.setItem('loggedBlogAppUser', JSON.stringify(user)) //save user to local storage
+      setUser(user) // Save the user to state
       // Optionally, fetch blogs after successful login
       const blogsResponse = await axios.get('/api/blogs', {
         headers: { Authorization: `Bearer ${response.data.token}` },
@@ -22,6 +42,15 @@ const App = () => {
       alert('Invalid username or password')
     }
   }
+
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('loggedBlogAppUser') // remove user from local storage 
+    setUser(null) // remove user from state
+    setBlogs([]) // clear blog list
+  }
+
 
   if (user === null) {
     return (
@@ -55,7 +84,7 @@ const App = () => {
   return (
     <div>
       <h2>Blogs</h2>
-      <p>{user.name} is logged in</p>
+      <p>{user.name} is logged in <button onClick={handleLogout}>logout</button></p>
       {blogs.map((blog) => (
         <div key={blog.id}>
           <strong>{blog.title}</strong> by {blog.author}
