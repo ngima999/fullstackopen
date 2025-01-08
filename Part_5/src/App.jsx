@@ -3,6 +3,7 @@ import axios from 'axios';
 import Login from './Login';
 import Notification from './Notification';
 import CreateBlog from './CreateBlog';
+import Blog from './Blog';
 
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(false);
@@ -98,10 +99,8 @@ const App = () => {
 
           <h2>Blogs</h2>
           {blogs.map((blog) => (
-            <div key={blog.id}>
-              <strong>{blog.title}</strong> by {blog.author}
-            </div>
-          ))}
+  <Blog key={blog.id} blog={blog} />
+))}
         </>
       )}
     </div>
