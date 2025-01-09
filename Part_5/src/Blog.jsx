@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Blog = ({ blog, user, handleUpdateBlog }) => {
+
+const Blog = ({ blog, user, handleUpdateBlog, showNotification }) => {
   const [detailsVisible, setDetailsVisible] = useState(false);
 
   const blogStyle = {
@@ -12,21 +13,28 @@ const Blog = ({ blog, user, handleUpdateBlog }) => {
     marginBottom: 5,
   };
 
-  
-
   const handleLike = async (blog) => {
     try {
       const updatedBlog = {
-        ...blog,  // This includes all the fields of the original blog
+        ...blog,
         likes: blog.likes + 1,
-        user: blog.user._id,  // Correctly pass the user ID as string
       };
+  
+      // Safeguard: Ensure `user` is properly handled
+      if (updatedBlog.user && updatedBlog.user._id) {
+        updatedBlog.user = updatedBlog.user._id;
+      } else {
+        delete updatedBlog.user; // Remove the user field if undefined or missing
+      }
   
       // Send the updated blog to the backend
       const response = await axios.put(`/api/blogs/${blog.id}`, updatedBlog);
-      handleUpdateBlog(response.data); // Update the blog list with the updated blog
+  
+      handleUpdateBlog(response.data); // Update the blog list
+      console.log('Blog liked:', response.data);
     } catch (error) {
       console.error('Failed to like the blog:', error);
+      showNotification('Failed to like the blog', true);
     }
   };
   
@@ -47,7 +55,7 @@ const Blog = ({ blog, user, handleUpdateBlog }) => {
             Likes: {blog.likes}{' '}
             <button onClick={() => handleLike(blog)}>Like</button>
           </p>
-          <p>Added by: {user?.name || 'Unknown'}</p>
+          <p>Added by: {blog.user?.name || 'Unknown'}</p>
         </div>
       )}
     </div>

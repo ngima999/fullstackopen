@@ -9,7 +9,7 @@ const App = () => {
   const [loginVisible, setLoginVisible] = useState(false);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState('');
-const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ message: '', isError: false });
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -17,15 +17,21 @@ const [password, setPassword] = useState('');
   useEffect(() => {
     axios
       .get('/api/blogs')
-      .then((response) => setBlogs(response.data))
+      .then((response) => {
+        // Sort blogs by likes in descending order
+        const sortedBlogs = response.data.sort((a, b) => b.likes - a.likes);
+        setBlogs(sortedBlogs);
+      })
       .catch((error) => console.error('Failed to fetch blogs:', error));
-
+  
     const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
     }
   }, []);
+  
+
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -47,25 +53,34 @@ const [password, setPassword] = useState('');
     showNotification('Logged out successfully', false);
 
     // Reset form inputs
-  setUsername('');
-  setPassword('');
+    setUsername('');
+    setPassword('');
   };
 
   const handleNewBlog = (blog) => {
-    setBlogs([...blogs, blog]);
+    const updatedBlogs = [...blogs, blog];
+    // Sort the blogs before setting the state
+    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes);
+    setBlogs(sortedBlogs);
     setShowCreateForm(false); // Hide form after creation
     showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false);
   };
+  
+  const handleUpdateBlog = (updatedBlog) => {
+    const updatedBlogs = blogs.map((blog) =>
+      blog.id === updatedBlog.id ? updatedBlog : blog
+    );
+    // Sort the blogs before setting the state
+    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes);
+    setBlogs(sortedBlogs);
+  };
+  
 
   const showNotification = (message, isError = false) => {
     setNotification({ message, isError });
     setTimeout(() => {
       setNotification({ message: '', isError: false });
     }, 5000);
-  };
-
-  const handleUpdateBlog = (updatedBlog) => {
-    setBlogs(blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)));
   };
 
   return (
@@ -107,10 +122,16 @@ const [password, setPassword] = useState('');
             <button onClick={() => setShowCreateForm(true)}>Create New Blog</button>
           )}
 
-     <h2>Blogs</h2>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} handleUpdateBlog={handleUpdateBlog} />
-      ))}
+          <h2>Blogs</h2>
+          {blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              user={blog.user}
+              handleUpdateBlog={handleUpdateBlog}
+              showNotification={showNotification}
+            />
+          ))}
         </>
       )}
     </div>
