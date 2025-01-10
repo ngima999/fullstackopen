@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react'
+import axios from 'axios'
 
 const CreateBlog = ({ user, handleNewBlog, toggleVisibility }) => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('');
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   const handleBlogCreation = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
       const response = await axios.post(
         '/api/blogs',
         { title, author, url },
         { headers: { Authorization: `Bearer ${user.token}` } }
-      );
-      handleNewBlog(response.data);
+      )
+      handleNewBlog(response.data)
     } catch (error) {
-      console.error('Failed to create blog:', error);
+      console.error('Failed to create blog:', error)
     }
-  };
+  }
 
   return (
     <div>
@@ -54,7 +54,7 @@ const CreateBlog = ({ user, handleNewBlog, toggleVisibility }) => {
         </button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default CreateBlog;
+export default CreateBlog

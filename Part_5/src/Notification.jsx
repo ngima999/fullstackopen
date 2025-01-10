@@ -1,8 +1,8 @@
 // Notification.jsx
-import React from 'react';
+import React from 'react'
 
 const Notification = ({ notification }) => {
-  if (!notification.message) return null;
+  if (!notification.message) return null
 
   const notificationStyle = {
     color: 'white',
@@ -12,9 +12,9 @@ const Notification = ({ notification }) => {
     borderRadius: '5px',
     padding: '10px',
     marginBottom: '10px',
-  };
+  }
 
-  return <div style={notificationStyle}>{notification.message}</div>;
-};
+  return <div style={notificationStyle}>{notification.message}</div>
+}
 
-export default Notification;
+export default Notification

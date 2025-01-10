@@ -1,114 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Login from './Login';
-import Notification from './Notification';
-import CreateBlog from './CreateBlog';
-import Blog from './Blog';
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import Login from './Login'
+import Notification from './Notification'
+import CreateBlog from './CreateBlog'
+import Blog from './Blog'
 
 const App = () => {
-  const [loginVisible, setLoginVisible] = useState(false);
-  const [user, setUser] = useState(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [blogs, setBlogs] = useState([]);
-  const [notification, setNotification] = useState({ message: '', isError: false });
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [loginVisible, setLoginVisible] = useState(false)
+  const [user, setUser] = useState(null)
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [blogs, setBlogs] = useState([])
+  const [notification, setNotification] = useState({ message: '', isError: false })
+  const [showCreateForm, setShowCreateForm] = useState(false)
 
   useEffect(() => {
-    
- // Get the logged-in user from localStorage once during component mount
- const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
- if (loggedUserJSON) {
-   const user = JSON.parse(loggedUserJSON);
-   setUser(user);
- }
+
+    // Check if a user is already logged in from localStorage
+    const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+    }
 
     axios
       .get('/api/blogs')
       .then((response) => {
-        console.log('Fetched Blogs:', response.data);
         // Sort blogs by likes in descending order
-        const sortedBlogs = response.data.sort((a, b) => b.likes - a.likes);
-        setBlogs(sortedBlogs);
+        const sortedBlogs = response.data.sort((a, b) => b.likes - a.likes)
+        setBlogs(sortedBlogs)
       })
-      .catch((error) => console.error('Failed to fetch blogs:', error));
-  
-  }, []);
-  
+      .catch((error) => console.error('Failed to fetch blogs:', error))
+
+  }, [])
+
 
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
-      const response = await axios.post('/api/login', { username, password });
-      const user = response.data;
-      localStorage.setItem('loggedBlogAppUser', JSON.stringify(user));
-      setUser(user);
-      showNotification('Login successful', false);
+      const response = await axios.post('/api/login', { username, password })
+      const user = response.data
+      localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
+      setUser(user)
+      showNotification('Login successful', false)
     } catch (error) {
-      console.error('Login failed:', error);
-      showNotification('Invalid username or password', true);
+      console.error('Login failed:', error)
+      showNotification('Invalid username or password', true)
     }
-  };
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('loggedBlogAppUser');
-    setUser(null);
-    showNotification('Logged out successfully', false);
+    localStorage.removeItem('loggedBlogAppUser')
+    setUser(null)
+    showNotification('Logged out successfully', false)
 
     // Reset form inputs
-    setUsername('');
-    setPassword('');
-  };
+    setUsername('')
+    setPassword('')
+  }
 
   const handleNewBlog = (blog) => {
-    const updatedBlogs = [...blogs, blog];
+    const updatedBlogs = [...blogs, blog]
     // Sort the blogs before setting the state
-    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes);
-    setBlogs(sortedBlogs);
-    setShowCreateForm(false); // Hide form after creation
-    showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false);
-  };
-  
+    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
+    setBlogs(sortedBlogs)
+    setShowCreateForm(false) // Hide form after creation
+    showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false)
+  }
+
   const handleUpdateBlog = (updatedBlog) => {
     const updatedBlogs = blogs.map((blog) =>
       blog.id === updatedBlog.id ? updatedBlog : blog
-    );
+    )
     // Sort the blogs before setting the state
-    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes);
-    setBlogs(sortedBlogs);
-  };
-  
+    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
+    setBlogs(sortedBlogs)
+  }
+
 
   const showNotification = (message, isError = false) => {
-    setNotification({ message, isError });
+    setNotification({ message, isError })
     setTimeout(() => {
-      setNotification({ message: '', isError: false });
-    }, 5000);
-  };
+      setNotification({ message: '', isError: false })
+    }, 5000)
+  }
 
 
 
   const handleDeleteBlog = async (id) => {
     try {
-      const token = `Bearer ${user.token}`; // Make sure user.token exists
-      
+      const token = `Bearer ${user.token}` // Make sure user.token exists
+
       await axios.delete(`/api/blogs/${id}`, {
         headers: {
           Authorization: token, // Correctly include the token
         },
-      });
-  
-      setBlogs(blogs.filter((blog) => blog.id !== id));
-      showNotification('Blog deleted successfully!');
+      })
+
+      setBlogs(blogs.filter((blog) => blog.id !== id))
+      showNotification('Blog deleted successfully!')
     } catch (error) {
-      console.error('Error deleting blog:', error);
-      showNotification('Failed to delete the blog', true);
+      console.error('Error deleting blog:', error)
+      showNotification('Failed to delete the blog', true)
     }
-  };
-  
-  
-  
+  }
+
+
+
 
 
   return (
@@ -164,7 +163,7 @@ const App = () => {
         </>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

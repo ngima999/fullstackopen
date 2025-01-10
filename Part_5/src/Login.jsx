@@ -1,5 +1,5 @@
-// Login.jsx
-import React from 'react';
+import React from 'react'
+import PropTypes from 'prop-types' // Import PropTypes
 
 const Login = ({ username, password, setUsername, setPassword, handleLogin }) => {
   return (
@@ -27,7 +27,16 @@ const Login = ({ username, password, setUsername, setPassword, handleLogin }) =>
         <button type="submit">login</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+// Define PropTypes for validation
+Login.propTypes = {
+  username: PropTypes.string.isRequired,
+  password: PropTypes.string.isRequired,
+  setUsername: PropTypes.func.isRequired,
+  setPassword: PropTypes.func.isRequired,
+  handleLogin: PropTypes.func.isRequired,
+}
+
+export default Login
