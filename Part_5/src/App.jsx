@@ -15,20 +15,24 @@ const App = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
+    
+ // Get the logged-in user from localStorage once during component mount
+ const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
+ if (loggedUserJSON) {
+   const user = JSON.parse(loggedUserJSON);
+   setUser(user);
+ }
+
     axios
       .get('/api/blogs')
       .then((response) => {
+        console.log('Fetched Blogs:', response.data);
         // Sort blogs by likes in descending order
         const sortedBlogs = response.data.sort((a, b) => b.likes - a.likes);
         setBlogs(sortedBlogs);
       })
       .catch((error) => console.error('Failed to fetch blogs:', error));
   
-    const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-    }
   }, []);
   
 
@@ -83,6 +87,30 @@ const App = () => {
     }, 5000);
   };
 
+
+
+  const handleDeleteBlog = async (id) => {
+    try {
+      const token = `Bearer ${user.token}`; // Make sure user.token exists
+      
+      await axios.delete(`/api/blogs/${id}`, {
+        headers: {
+          Authorization: token, // Correctly include the token
+        },
+      });
+  
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+      showNotification('Blog deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+      showNotification('Failed to delete the blog', true);
+    }
+  };
+  
+  
+  
+
+
   return (
     <div>
       <Notification notification={notification} />
@@ -106,7 +134,7 @@ const App = () => {
         </div>
       ) : (
         <p>
-          {user.name} logged in <button onClick={handleLogout}>Logout</button>
+          {user.name} logged in <button onClick={handleLogout} >Logout</button>
         </p>
       )}
 
@@ -130,6 +158,7 @@ const App = () => {
               user={blog.user}
               handleUpdateBlog={handleUpdateBlog}
               showNotification={showNotification}
+              handleDeleteBlog={handleDeleteBlog}
             />
           ))}
         </>

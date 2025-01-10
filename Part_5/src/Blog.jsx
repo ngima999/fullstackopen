@@ -1,44 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-
-const Blog = ({ blog, user, handleUpdateBlog, showNotification }) => {
+const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) => {
   const [detailsVisible, setDetailsVisible] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null); // To store the logged-in user
 
   const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid 2px',
-    borderWidth: 1,
-    marginBottom: 5,
+    padding: '10px 2px',
+    border: '2px solid',
+    marginBottom: '5px',
   };
 
-  const handleLike = async (blog) => {
+  // Fetch the logged-in user from localStorage
+  useEffect(() => {
+    const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
+    if (loggedUserJSON) {
+      setLoggedInUser(JSON.parse(loggedUserJSON));
+    }
+  }, []);
+
+  // Check if the logged-in user is the owner of the blog
+  const isBlogOwner = loggedInUser?.username === blog.user.username;
+
+  const handleLike = async () => {
     try {
       const updatedBlog = {
         ...blog,
         likes: blog.likes + 1,
+        user: blog.user._id,  // Correctly pass the user ID as string
       };
   
-      // Safeguard: Ensure `user` is properly handled
-      if (updatedBlog.user && updatedBlog.user._id) {
-        updatedBlog.user = updatedBlog.user._id;
-      } else {
-        delete updatedBlog.user; // Remove the user field if undefined or missing
+      const blogId = blog._id || 'default-id';  // Make sure the ID is valid
+      console.log('Blog ID:', blogId);
+  
+      // Get token from localStorage
+      const loggedUserJSON = localStorage.getItem('loggedBlogAppUser');
+      const loggedUser = loggedUserJSON ? JSON.parse(loggedUserJSON) : null;
+      const token = loggedUser ? `Bearer ${loggedUser.token}` : null;
+  
+      if (!token) {
+        console.error('No token found. User is not logged in.');
+        showNotification('You need to log in first!', true);
+        return;
       }
   
-      // Send the updated blog to the backend
-      const response = await axios.put(`/api/blogs/${blog.id}`, updatedBlog);
+      const response = await axios.put(`/api/blogs/${blogId}`, updatedBlog, {
+        headers: {
+          Authorization: token, // Authorization header with token
+        },
+      });
   
-      handleUpdateBlog(response.data); // Update the blog list
-      console.log('Blog liked:', response.data);
+      handleUpdateBlog(response.data);
+      showNotification(`Liked "${blog.title}" successfully!`);
     } catch (error) {
-      console.error('Failed to like the blog:', error);
+      console.error('Error liking the blog:', error);
       showNotification('Failed to like the blog', true);
+      console.log('Error details:', error.response?.data);
     }
   };
   
-  
+
+  const confirmDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${blog.title}" by ${blog.author}?`)) {
+      handleDeleteBlog(blog.id);
+    }
+  };
 
   return (
     <div style={blogStyle}>
@@ -53,9 +79,14 @@ const Blog = ({ blog, user, handleUpdateBlog, showNotification }) => {
           <p>URL: {blog.url}</p>
           <p>
             Likes: {blog.likes}{' '}
-            <button onClick={() => handleLike(blog)}>Like</button>
+            <button onClick={handleLike}>Like</button>
           </p>
           <p>Added by: {blog.user?.name || 'Unknown'}</p>
+          {isBlogOwner && (
+            <button onClick={confirmDelete} style={{ color: 'red' }}>
+              Delete
+            </button>
+          )}
         </div>
       )}
     </div>
