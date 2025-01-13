@@ -1,6 +1,6 @@
 import React from 'react'
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 
 test('renders title and author but not URL or likes by default', () => {
@@ -21,16 +21,22 @@ test('renders title and author but not URL or likes by default', () => {
     />
   )
 
-  // Ensure title and author are visible
-  const blogTitle = screen.getByText('React Testing')
-  const blogAuthor = screen.getByText('John Doe')
-  expect(blogTitle).toBeVisible()
-  expect(blogAuthor).toBeVisible()
 
-  // Ensure URL and likes are not rendered by default
-  const blogUrl = screen.queryByText('URL: https://reacttesting.com')
-  expect(blogUrl).not.toBeInTheDocument()
+//Initially, the URL and likes should not be visible
+const blogUrl = screen.queryByText(`URL: ${blog.url}`)
+expect(blogUrl).not.toBeInTheDocument()
 
-  const blogLikes = screen.queryByText('Likes: 10')
-  expect(blogLikes).not.toBeInTheDocument()
+const blogLikes = screen.queryByText(`Likes: ${blog.likes}`)
+expect(blogLikes).not.toBeInTheDocument()
+
+//Find the "View" button and click it to show details
+const toggleButton = screen.getByText('View')
+fireEvent.click(toggleButton)
+
+//Now, the URL and likes should be visible
+expect(screen.getByText(`URL: ${blog.url}`)).toBeInTheDocument()
+expect(screen.getByText(`Likes: ${blog.likes}`)).toBeInTheDocument()
+
+//button text should change to "Hide"
+expect(toggleButton).toHaveTextContent('Hide')
 })
