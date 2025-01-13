@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
-  const [loggedInUser, setLoggedInUser] = useState(null) // To store the logged-in user
+  const [loggedInUser, setLoggedInUser] = useState(null)
 
   const blogStyle = {
     padding: '10px 2px',
@@ -11,7 +11,6 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
     marginBottom: '5px',
   }
 
-  // Fetch the logged-in user from localStorage
   useEffect(() => {
     const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
@@ -19,7 +18,6 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
     }
   }, [])
 
-  // Check if the logged-in user is the owner of the blog
   const isBlogOwner = loggedInUser?.username === blog.user.username
 
   const handleLike = async () => {
@@ -27,11 +25,9 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
       const updatedBlog = {
         ...blog,
         likes: blog.likes + 1,
-        user: blog.user._id,  // Correctly pass the user ID as string
+        user: blog.user._id,
       }
 
-
-      // Get token from localStorage
       const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
       const loggedUser = loggedUserJSON ? JSON.parse(loggedUserJSON) : null
       const token = loggedUser ? `Bearer ${loggedUser.token}` : null
@@ -44,7 +40,7 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
 
       const response = await axios.put(`/api/blogs/${blog._id}`, updatedBlog, {
         headers: {
-          Authorization: token, // Authorization header with token
+          Authorization: token,
         },
       })
 
@@ -57,7 +53,6 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
     }
   }
 
-
   const confirmDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${blog.title}" by ${blog.author}?`)) {
       handleDeleteBlog(blog.id)
@@ -65,23 +60,24 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
   }
 
   return (
-    <div style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}{' '}
-        <button onClick={() => setDetailsVisible(!detailsVisible)}>
+    <div style={blogStyle} className="blog">
+      <div className="blog-summary">
+        <span className="blog-title">{blog.title}</span>
+        <span className="blog-author">{blog.author}</span>
+        <button onClick={() => setDetailsVisible(!detailsVisible)} className="blog-toggle-details">
           {detailsVisible ? 'Hide' : 'View'}
         </button>
       </div>
       {detailsVisible && (
-        <div>
-          <p>URL: {blog.url}</p>
-          <p>
+        <div className="blog-details">
+          <p className="blog-url">URL: {blog.url}</p>
+          <p className="blog-likes">
             Likes: {blog.likes}{' '}
-            <button onClick={handleLike}>Like</button>
+            <button onClick={handleLike} className="blog-like-button">Like</button>
           </p>
-          <p>Added by: {blog.user?.name || 'Unknown'}</p>
+          <p className="blog-user">Added by: {blog.user?.name || 'Unknown'}</p>
           {isBlogOwner && (
-            <button onClick={confirmDelete} style={{ color: 'red' }}>
+            <button onClick={confirmDelete} className="blog-delete-button" style={{ color: 'red' }}>
               Delete
             </button>
           )}

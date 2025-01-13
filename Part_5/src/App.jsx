@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import Login from './Login'
-import Notification from './Notification'
-import CreateBlog from './CreateBlog'
-import Blog from './Blog'
+import Login from './components/Login'
+import Notification from './components/Notification'
+import CreateBlog from './components/CreateBlog'
+import Blog from './components/Blog'
 
 const App = () => {
   const [loginVisible, setLoginVisible] = useState(false)
