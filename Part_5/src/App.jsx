@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import Togglable from './components/Togglable'
 import Login from './components/Login'
 import Notification from './components/Notification'
 import CreateBlog from './components/CreateBlog'
 import Blog from './components/Blog'
 
 const App = () => {
-  const [loginVisible, setLoginVisible] = useState(false)
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState({ message: '', isError: false })
-  const [showCreateForm, setShowCreateForm] = useState(false)
 
   useEffect(() => {
-
-    // Check if a user is already logged in from localStorage
     const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
@@ -26,67 +23,52 @@ const App = () => {
     axios
       .get('/api/blogs')
       .then((response) => {
-        // Sort blogs by likes in descending order
-        const sortedBlogs = response.data.sort((a, b) => b.likes - a.likes)
-        setBlogs(sortedBlogs)
+        setBlogs(response.data.sort((a, b) => b.likes - a.likes))
       })
       .catch((error) => console.error('Failed to fetch blogs:', error))
-
   }, [])
-
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const response = await axios.post('/api/login', { username, password })
-      const user = response.data
-      localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      setUser(user)
+      localStorage.setItem('loggedBlogAppUser', JSON.stringify(response.data))
+      setUser(response.data)
       showNotification('Login successful', false)
-    } catch (error) {
-      console.error('Login failed:', error)
+    } catch {
       showNotification('Invalid username or password', true)
     }
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('loggedBlogAppUser')
+    localStorage.removeItem('loggedBlogAppUser');
     setUser(null)
     showNotification('Logged out successfully', false)
-
-    // Reset form inputs
     setUsername('')
     setPassword('')
   }
 
-  const handleNewBlog = (blog) => {
-    const updatedBlogs = [...blogs, blog]
-    // Sort the blogs before setting the state
-    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
-    setBlogs(sortedBlogs)
-    setShowCreateForm(false) // Hide form after creation
-    showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false)
+  const handleNewBlog = async (blog) => {
+    try {
+      // Refetch the blogs from the server to maintain sorting
+      const response = await axios.get('/api/blogs')
+      setBlogs(response.data.sort((a, b) => b.likes - a.likes))
+      showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false)
+    } catch (error) {
+      console.error('Failed to fetch blogs after adding a new one:', error)
+      showNotification('Failed to update the blogs list', true)
+    }
   }
 
   const handleUpdateBlog = (updatedBlog) => {
-    const updatedBlogs = blogs.map((blog) =>
-      blog.id === updatedBlog.id ? updatedBlog : blog
-    )
-    // Sort the blogs before setting the state
-    const sortedBlogs = updatedBlogs.sort((a, b) => b.likes - a.likes)
-    setBlogs(sortedBlogs)
+    setBlogs((prevBlogs) => {
+      const updatedBlogs = prevBlogs.map((blog) =>
+        blog.id === updatedBlog.id ? {...blog, likes: updatedBlog.likes} : blog
+      )
+      // Sort blogs by likes after updating the like
+      return updatedBlogs.sort((a, b) => b.likes - a.likes)
+    })
   }
-
-
-  const showNotification = (message, isError = false) => {
-    setNotification({ message, isError })
-    setTimeout(() => {
-      setNotification({ message: '', isError: false })
-    }, 5000)
-  }
-
-
 
   const handleDeleteBlog = async (id) => {
     try {
@@ -106,61 +88,45 @@ const App = () => {
     }
   }
 
-
-
-
+  const showNotification = (message, isError = false) => {
+    setNotification({ message, isError })
+    setTimeout(() => setNotification({ message: '', isError: false }), 5000)
+  }
 
   return (
     <div>
       <Notification notification={notification} />
 
       {!user ? (
-        <div>
-          {loginVisible ? (
-            <div>
-              <Login
-                username={username}
-                password={password}
-                setUsername={setUsername}
-                setPassword={setPassword}
-                handleLogin={handleLogin}
-              />
-              <button onClick={() => setLoginVisible(false)}>Cancel</button>
-            </div>
-          ) : (
-            <button onClick={() => setLoginVisible(true)}>Log in</button>
-          )}
-        </div>
+        <Togglable buttonLabel="Log in">
+          <Login
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+          />
+        </Togglable>
       ) : (
-        <p>
-          {user.name} logged in <button onClick={handleLogout} >Logout</button>
-        </p>
-      )}
-
-      {user && (
-        <>
-          {showCreateForm ? (
-            <CreateBlog
-              user={user}
-              handleNewBlog={handleNewBlog}
-              toggleVisibility={() => setShowCreateForm(false)}
-            />
-          ) : (
-            <button onClick={() => setShowCreateForm(true)}>Create New Blog</button>
-          )}
-
+        <div>
+          <p>
+            {user.name} logged in <button onClick={handleLogout}>Logout</button>
+          </p>
+          <Togglable buttonLabel="Create New Blog">
+            <CreateBlog user={user} handleNewBlog={handleNewBlog} />
+          </Togglable>
           <h2>Blogs</h2>
           {blogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
-              user={blog.user}
-              handleUpdateBlog={handleUpdateBlog}
+              handleUpdateBlog={handleUpdateBlog} // Pass the update function
+              handleDeleteBlog={handleDeleteBlog} // Pass the delete function
               showNotification={showNotification}
-              handleDeleteBlog={handleDeleteBlog}
+              authorizedUser={user}
             />
           ))}
-        </>
+        </div>
       )}
     </div>
   )

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
-const CreateBlog = ({ user, handleNewBlog, toggleVisibility }) => {
+const CreateBlog = ({ user, handleNewBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -18,42 +18,22 @@ const CreateBlog = ({ user, handleNewBlog, toggleVisibility }) => {
     } catch (error) {
       console.error('Failed to create blog:', error)
     }
-  }
+  };
 
   return (
-    <div>
+    <form onSubmit={handleBlogCreation}>
       <h3>Create new</h3>
-      <form onSubmit={handleBlogCreation}>
-        <div>
-          Title:
-          <input
-            type="text"
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          Author:
-          <input
-            type="text"
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          URL:
-          <input
-            type="text"
-            value={url}
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">Create</button>
-        <button type="button" onClick={toggleVisibility}>
-          Cancel
-        </button>
-      </form>
-    </div>
+      <div>
+        Title: <input value={title} onChange={({ target }) => setTitle(target.value)} />
+      </div>
+      <div>
+        Author: <input value={author} onChange={({ target }) => setAuthor(target.value)} />
+      </div>
+      <div>
+        URL: <input value={url} onChange={({ target }) => setUrl(target.value)} />
+      </div>
+      <button type="submit">Create</button>
+    </form>
   )
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) => {
+const Blog = ({ blog, handleUpdateBlog, handleDeleteBlog, showNotification, authorizedUser  }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
   const [loggedInUser, setLoggedInUser] = useState(null)
 
@@ -25,10 +25,10 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
       const updatedBlog = {
         ...blog,
         likes: blog.likes + 1,
-        user: blog.user._id,
+
       }
 
-      const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
+      const loggedUserJSON = localStorage.getItem('loggedBlogAppUser') 
       const loggedUser = loggedUserJSON ? JSON.parse(loggedUserJSON) : null
       const token = loggedUser ? `Bearer ${loggedUser.token}` : null
 
@@ -38,14 +38,17 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
         return
       }
 
-      const response = await axios.put(`/api/blogs/${blog._id}`, updatedBlog, {
+      const response = await axios.put(`/api/blogs/${blog.id}`, updatedBlog, {
         headers: {
           Authorization: token,
         },
       })
 
+      // Update the specific blog in the parent component
       handleUpdateBlog(response.data)
-      showNotification(`Liked "${blog.title}" successfully!`)
+      console.log('Liked the blog:', response.data);
+
+    showNotification(`Liked "${blog.title}" successfully!`)
     } catch (error) {
       console.error('Error liking the blog:', error)
       showNotification('Failed to like the blog', true)
@@ -75,7 +78,7 @@ const Blog = ({ blog, handleUpdateBlog, showNotification, handleDeleteBlog }) =>
             Likes: {blog.likes}{' '}
             <button onClick={handleLike} className="blog-like-button">Like</button>
           </p>
-          <p className="blog-user">Added by: {blog.user?.name || 'Unknown'}</p>
+          <p className="blog-user">Added by: {blog.user?.name || 'unknown'}</p>
           {isBlogOwner && (
             <button onClick={confirmDelete} className="blog-delete-button" style={{ color: 'red' }}>
               Delete
