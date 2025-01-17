@@ -46,9 +46,8 @@ const Blog = ({ blog, handleUpdateBlog, handleDeleteBlog, showNotification, auth
 
       // Update the specific blog in the parent component
       handleUpdateBlog(response.data)
-      console.log('Liked the blog:', response.data);
-
-    showNotification(`Liked "${blog.title}" successfully!`)
+      console.log('Liked the blog:', response.data)
+      showNotification(`Liked "${blog.title}" successfully!`)
     } catch (error) {
       console.error('Error liking the blog:', error)
       showNotification('Failed to like the blog', true)

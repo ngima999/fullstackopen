@@ -6,8 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       // Proxy configuration to handle API calls during development
-      "/api": {
-        target: "http://localhost:3001", // Backend server URL
+      '/api': {
+        target: 'http://localhost:3001', // Backend server URL
         changeOrigin: true, // Adjusts the origin of the request
       },
     },
