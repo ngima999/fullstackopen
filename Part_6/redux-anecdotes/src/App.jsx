@@ -5,7 +5,8 @@ const App = () => {
   const anecdotes = useSelector(state => state)
   const dispatch = useDispatch()
 
-
+  // sort by votes
+  const sortedAnecdotes = anecdotes.sort((a, b) => b.votes - a.votes)
 
   const addAnecdote = ( event ) => {
     event.preventDefault()
