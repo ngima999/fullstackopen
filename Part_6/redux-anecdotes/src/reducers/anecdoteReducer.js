@@ -1,4 +1,5 @@
-import { createSlice } from 'redux'
+import { createSlice } from '@reduxjs/toolkit'
+import { showNotification } from './notificationReducer' // Import notification thunk
 
 const anecdotesAtStart = [
   'If it hurts, do it more often',
@@ -11,13 +12,11 @@ const anecdotesAtStart = [
 
 const getId = () => Number((100000 * Math.random()).toFixed(0))
 
-const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
+const asObject = (anecdote) => ({
+  content: anecdote,
+  id: getId(),
+  votes: 0
+})
 
 const initialState = anecdotesAtStart.map(asObject)
 
@@ -25,22 +24,37 @@ const anecdoteSlice = createSlice({
   name: 'anecdotes',
   initialState,
   reducers: {
-    createAnecdote: (state, action) => {
-      state.push({
-        content: action.payload,
-        id: getId(),
-        votes: 0
-      })
+    addAnecdote: (state, action) => {
+      state.push(action.payload) // Fix: Correctly push the entire anecdote object
     },
     voteAnecdote: (state, action) => {
       const anecdote = state.find(a => a.id === action.payload)
-      if (anecdote) anecdote.votes += 1
+      if (anecdote) {
+        anecdote.votes += 1
+      }
     }
   }
 })
 
-// Export action creators
-export const { createAnecdote, voteAnecdote } = anecdoteSlice.actions
+// Export reducer actions
+export const { addAnecdote, voteAnecdote } = anecdoteSlice.actions
+
+// Thunks
+export const createAnecdote = (content) => {
+  return (dispatch) => {
+    const newAnecdote = { content, id: getId(), votes: 0 }
+    dispatch(addAnecdote(newAnecdote)) // Fix: Correct action name
+    dispatch(showNotification(`You added "${content}"`))
+  }
+}
+
+export const voteForAnecdote = (id) => {
+  return (dispatch, getState) => {
+    const anecdote = getState().anecdotes.find(a => a.id === id)
+    dispatch(voteAnecdote(id))
+    dispatch(showNotification(`You voted for "${anecdote.content}"`))
+  }
+}
 
 // Export reducer
 export default anecdoteSlice.reducer
