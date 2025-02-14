@@ -13,7 +13,7 @@ const notificationSlice = createSlice({
 export const { setNotification, clearNotification } = notificationSlice.actions
 
 // Thunk to show notification for 5 seconds
-export const showNotification = (message, timeout = 5000) => {
+export const showNotification = (message, timeout = 500) => {
     return (dispatch) => {
       dispatch(setNotification(message))
       setTimeout(() => {
