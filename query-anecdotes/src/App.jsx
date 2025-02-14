@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNotification } from './context/NotificationContext'
 import axios from 'axios'
+import Notification from './components/Notification'
+import AnecdoteForm from './components/AnecdoteForm'
 
 const getAnecdotes = async () => {
   const response = await axios.get('http://localhost:3001/anecdotes')
@@ -14,6 +17,7 @@ const voteAnecdote = async (anecdote) => {
 
 const App = () => {
   const queryClient = useQueryClient()
+  const { dispatch } = useNotification()
 
   const { data: anecdotes, error, isLoading } = useQuery({
     queryKey: ['anecdotes'],
@@ -29,6 +33,9 @@ const App = () => {
           anecdote.id === updatedAnecdote.id ? updatedAnecdote : anecdote
         )
       )
+
+      dispatch({ type: 'SET_NOTIFICATION', payload: `You voted for "${updatedAnecdote.content}"` })
+      setTimeout(() => dispatch({ type: 'CLEAR_NOTIFICATION' }), 5000)
     }
   })
 
@@ -38,6 +45,8 @@ const App = () => {
   return (
     <div>
       <h1>Anecdotes</h1>
+      <Notification />
+      <AnecdoteForm />
       {anecdotes.map(anecdote => (
         <div key={anecdote.id}>
           {anecdote.content} <strong>has {anecdote.votes} votes</strong>
