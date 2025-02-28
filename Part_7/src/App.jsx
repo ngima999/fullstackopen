@@ -67,43 +67,51 @@ const Footer = () => (
 
 // Form component to create a new anecdote
 const CreateNew = (props) => {
-  const content = useField('')
-  const author = useField('')
-  const info = useField('')
-  const navigate = useNavigate()
+  const content = useField("text");
+  const author = useField("text");
+  const info = useField("text");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    props.addNew({ 
-      content: content.value, 
-      author: author.value, 
-      info: info.value, 
-      votes: 0 })
+    e.preventDefault();
+    props.addNew({
+      content: content.props.value,
+      author: author.props.value,
+      info: info.props.value,
+      votes: 0,
+    });
 
-    props.setNotification(`a new anecdote '${content.value}' created!`)
+    props.setNotification(`A new anecdote '${content.props.value}' created!`);
+    setTimeout(() => props.setNotification(""), 5000);
+    navigate("/");
+  };
 
-    setTimeout(() => props.setNotification(''), 5000)
-    navigate('/')
-  }
+  const handleReset = () => {
+    content.reset();
+    author.reset();
+    info.reset();
+  };
 
   return (
     <div>
       <h2>Create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          content <input {...content} />
+          content <input {...content.props} />
         </div>
         <div>
-          author <input {...author} />
+          author <input {...author.props} />
         </div>
         <div>
-          url for more info <input {...info}/>
+          url for more info <input {...info.props} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button> <br /> <br />
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
-  )
-}
+  );
+};
+
 
 // Main application component
 const App = () => {
