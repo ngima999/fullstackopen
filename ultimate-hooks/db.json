@@ -1,0 +1,64 @@
+{
+  "notes": [
+    {
+      "id": "1",
+      "content": "custom-hooks are awesome!"
+    },
+    {
+      "id": "2",
+      "content": "best feature ever <3"
+    },
+    {
+      "content": "",
+      "id": "3"
+    },
+    {
+      "content": "Hello world",
+      "id": "4"
+    },
+    {
+      "id": "abe2",
+      "content": "Nepal Nepal"
+    },
+    {
+      "content": "India",
+      "id": "ZK6zWh-"
+    },
+    {
+      "content": "england",
+      "id": "yPIhvED"
+    }
+  ],
+  "persons": [
+    {
+      "id": "1",
+      "name": "mluukkai",
+      "number": "040-5483923"
+    },
+    {
+      "id": "2",
+      "name": "hellas",
+      "number": "012-123123"
+    },
+    {
+      "name": "Hari",
+      "number": "9800000000",
+      "id": "3"
+    },
+    {
+      "id": "d9b0",
+      "name": "Kira",
+      "number": "8787676543"
+    },
+    {
+      "name": "lala",
+      "number": "55443",
+      "id": "GuBWtNN"
+    },
+    {
+      "name": "ram",
+      "number": "1212",
+      "id": "Ue6KFYW"
+    }
+  ]
+}
