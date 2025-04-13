@@ -10,6 +10,7 @@ const Login = ({ username, password, setUsername, setPassword, handleLogin }) =>
           username
           <input
             type="text"
+            placeholder='username'
             value={username}
             onChange={({ target }) => setUsername(target.value)}
             autoComplete="username"
@@ -19,6 +20,7 @@ const Login = ({ username, password, setUsername, setPassword, handleLogin }) =>
           password
           <input
             type="password"
+            placeholder='password'
             value={password}
             onChange={({ target }) => setPassword(target.value)}
             autoComplete="current-password"

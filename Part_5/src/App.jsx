@@ -13,19 +13,24 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState({ message: '', isError: false })
 
+
   useEffect(() => {
     const loggedUserJSON = localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      const fetchBlogs = async () => {
+        try {
+          const response = await axios.get('/api/blogs', {
+            headers: { Authorization: `Bearer ${user.token}` }
+          })
+          setBlogs(response.data.sort((a, b) => b.likes - a.likes))
+        } catch (error) {
+          console.error('Failed to fetch blogs:', error)
+        }
+      }
+      fetchBlogs()
     }
-
-    axios
-      .get('/api/blogs')
-      .then((response) => {
-        setBlogs(response.data.sort((a, b) => b.likes - a.likes))
-      })
-      .catch((error) => console.error('Failed to fetch blogs:', error))
   }, [])
 
   const handleLogin = async (event) => {
@@ -48,17 +53,22 @@ const App = () => {
     setPassword('')
   }
 
-  const handleNewBlog = async (blog) => {
+
+  const handleNewBlog = async (newBlog) => {
     try {
-      // Refetch the blogs from the server to maintain sorting
-      const response = await axios.get('/api/blogs')
-      setBlogs(response.data.sort((a, b) => b.likes - a.likes))
-      showNotification(`A new blog "${blog.title}" by ${blog.author} added`, false)
+      const response = await axios.post(
+        '/api/blogs',
+        newBlog,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      )
+      setBlogs((prevBlogs) => [...prevBlogs, response.data]) // Add the new blog to the state
+      showNotification(`A new blog "${response.data.title}" by ${response.data.author} added`)
     } catch (error) {
-      console.error('Failed to fetch blogs after adding a new one:', error)
-      showNotification('Failed to update the blogs list', true)
+      console.error('Failed to create blog:', error)
+      alert('Failed to create blog')
     }
   }
+
 
   const handleUpdateBlog = (updatedBlog) => {
     setBlogs((prevBlogs) => {
@@ -109,7 +119,7 @@ const App = () => {
         </Togglable>
       ) : (
         <div>
-          <p>
+          <p placeholder='userLoginMessage'>
             {user.name} logged in <button onClick={handleLogout}>Logout</button>
           </p>
           <Togglable buttonLabel="Create New Blog">

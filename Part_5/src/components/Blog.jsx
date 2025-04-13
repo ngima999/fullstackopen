@@ -79,7 +79,7 @@ const Blog = ({ blog, handleUpdateBlog, handleDeleteBlog, showNotification, auth
           </p>
           <p className="blog-user">Added by: {blog.user?.name || 'unknown'}</p>
           {isBlogOwner && (
-            <button onClick={confirmDelete} className="blog-delete-button" style={{ color: 'red' }}>
+            <button onClick={confirmDelete} className="blog-delete-button" placeholder='Delete' style={{ color: 'red' }}>
               Delete
             </button>
           )}
